@@ -12,13 +12,13 @@ help:
 	@echo "  make test            - 테스트 실행 (pytest)"
 	@echo "  make shell           - Poetry 가상환경 내에서 셸 실행"
 	@echo "  make jupyter         - jupyter notebook 서버 실행"
+	@echo "  make run             - FastAPI 서버 실행"
 	@echo "  --------------------------- docker 관련 ----------------------"
-	@echo "  make docker-up       - docker container 실행"
-	@echo "  make docker-up WITH=<그룹명> - 특정 그룹에 대한 docker container 실행"
-	@echo "  make docker-build    - docker container build"
-	@echo "  make docker-build WITH=<그룹명> - 특정 그룹에 대한 docker container build"
+	@echo "  make docker-up       - FastAPI docker container 실행"
+	@echo "  make docker-build    - FastAPI docker container build 후 실행"
 	@echo "  make docker-down     - docker container 종료"
-	@echo "  make docker-in       - poetry_jupyter docker container에 들어가기"
+	@echo "  make docker-in       - FastAPI docker container에 들어가기"
+	@echo "  make docker-logs     - FastAPI container 로그 확인"
 	@echo "  --------------------------- hydra 실험 관련 ----------------------"
 	@echo "  run-exp <실험관련설정>     - 실험 진행하기. 예시: make run-exp logger=INFO"
 
@@ -51,17 +51,23 @@ shell:
 jupyter:
 	poetry run jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.token='' --NotebookApp.disable_check_xsrf=True
 
+run:
+	poetry run python src/main.py
+
 docker-up:
-	$(if $(WITH), WITH=$(WITH),) docker compose -f docker/docker-compose.yaml up -d
+	docker compose up -d
 
 docker-build:
-	$(if $(WITH), WITH=$(WITH),) docker compose -f docker/docker-compose.yaml up -d --build
+	docker compose up -d --build
 
 docker-down:
-	docker compose -f docker/docker-compose.yaml down
+	docker compose down
 
 docker-in:
-	docker exec -it project_manager_agent "bash"
+	docker exec -it project_manage_agent-fastapi-1 bash
+
+docker-logs:
+	docker compose logs -f fastapi
 
 run-exp:
 	poetry run python src/train.py $(foreach v,$(filter-out $@,$(MAKECMDGOALS)), $(v)=$($(v)))
