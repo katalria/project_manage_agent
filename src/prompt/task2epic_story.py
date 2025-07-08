@@ -28,7 +28,7 @@ epic_story_classification_prompt = PromptTemplate(
 - 한글로 작성해주세요.
 
 ### 분석 프로세스
-1. **Task 분석**: 각 Task의 규모와 성격을 파악
+1. **Task 분석**: 각 Task의 규모와 성격을 파악c
 2. **그루핑**: 유사한 기능/목적의 Task들을 묶어 Epic 후보 식별
 3. **Epic 구성**: 그룹별로 Epic 제목과 목표 설정
 4. **Story 변환**: 각 Task를 사용자 중심 Story로 변환

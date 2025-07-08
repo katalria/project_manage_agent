@@ -5,7 +5,7 @@ from typing import List
 from openai import OpenAI
 from dotenv import load_dotenv
 
-from routes import epic_detection_route
+from routes import epic_detection_route, project_management_route
 from models.models import TaskListInput, TaskClassificationResponse, EpicStoryGroup
 from prompt.task2epic_story import epic_story_classification_prompt
 
@@ -18,6 +18,7 @@ app = FastAPI(
 )
 
 app.include_router(epic_detection_route.router, prefix="/epic_detection")
+app.include_router(project_management_route.router, prefix="/project_management")
 
 class OpenAITaskClassificationService:
     def __init__(self):

@@ -1,11 +1,11 @@
-from langchain.chat_models import ChatOpenAI
-from src.prompt.epic_detection_prompt import epic_prompt
+from langchain_community.chat_models import ChatOpenAI
+from src.prompt.task2epic_story import epic_story_classification_prompt
 from typing import List, Dict
 
 class EpicDetectionAgent:
     def __init__(self, model_name: str = "gpt-4o-mini", temperature: float = 0.2):
         self.llm = ChatOpenAI(model=model_name, temperature=temperature)
-        self.prompt = epic_prompt
+        self.prompt = epic_story_classification_prompt
 
     def extract_epics(self, tasks: List[str]) -> Dict:
         print(f"{tasks} tasks")
