@@ -3,3 +3,4 @@ poetry.lock
 CLAUDE.md
 *.pyc
 .env
+*.csv
