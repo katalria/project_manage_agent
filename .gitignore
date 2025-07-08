@@ -1,0 +1,6 @@
+poetry.lock
+.venv/
+CLAUDE.md
+*.pyc
+.env
+*.csv
