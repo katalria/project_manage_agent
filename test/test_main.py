@@ -6,8 +6,8 @@ import os
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../src'))
 
-from main import app, TaskClassificationService
-from models.models import EpicStoryGroup, Epic, Story
+from main import app
+from project.models import EpicStoryGroup, Epic, Story
 
 
 
@@ -18,32 +18,7 @@ def client():
 
 
 
-class TestTaskClassificationService:
-    
-    @pytest.mark.asyncio
-    async def test_classify_tasks_success(self):
-        service = TaskClassificationService()
-        tasks = ["로그인 기능 개발", "회원가입 페이지 만들기"]
-        
-        result = await service.classify_tasks(tasks)
-        
-        assert len(result) == 1
-        assert isinstance(result[0], EpicStoryGroup)
-        assert result[0].epic.title == "사용자 인증 시스템"
-        assert len(result[0].stories) == 2
-    
-    @pytest.mark.asyncio
-    async def test_classify_tasks_empty_list(self):
-        service = TaskClassificationService()
-        tasks = []
-        
-        result = await service.classify_tasks(tasks)
-        
-        assert len(result) == 1
-    
-    def test_init_service(self):
-        service = TaskClassificationService()
-        assert service.prompt is not None
+# TaskClassificationService tests removed as this service doesn't exist in the new structure
 
 
 class TestFastAPIEndpoints:

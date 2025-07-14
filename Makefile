@@ -13,6 +13,8 @@ help:
 	@echo "  make shell           - Poetry 가상환경 내에서 셸 실행"
 	@echo "  make jupyter         - jupyter notebook 서버 실행"
 	@echo "  make run             - FastAPI 서버 실행"
+	@echo "  make dev             - FastAPI 개발 서버 실행 (hot reload)"
+	@echo "  make dev-debug       - FastAPI 개발 서버 실행 (debug mode)"
 	@echo "  --------------------------- docker 관련 ----------------------"
 	@echo "  make docker-up       - FastAPI docker container 실행"
 	@echo "  make docker-build    - FastAPI docker container build 후 실행"
@@ -53,6 +55,12 @@ jupyter:
 
 run:
 	poetry run python src/main.py
+
+dev:
+	poetry run uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
+
+dev-debug:
+	poetry run uvicorn src.main:app --reload --host 0.0.0.0 --port 8000 --log-level debug
 
 docker-up:
 	docker compose up -d

@@ -2,8 +2,8 @@ from typing import List, Dict, Optional
 import os
 import glob
 from datetime import datetime
-from src.services.epic_detection_agent import EpicDetectionAgent
-from src.services.story_point_agent import StoryPointAgent
+from epic.services import EpicGeneratorAgent
+from story.services import StoryPointAgent
 
 
 class ProjectManagementOrchestrator:
@@ -15,7 +15,7 @@ class ProjectManagementOrchestrator:
                  model_name: str = "gpt-4o-mini", 
                  temperature: float = 0.2,
                  reference_csv_path: Optional[str] = None):
-        self.epic_agent = EpicDetectionAgent(model_name, temperature)
+        # self.epic_agent = EpicGeneratorAgent(model_name, temperature)
         self.point_agent = StoryPointAgent(model_name, temperature)
         
         # 참고 CSV 파일 로드

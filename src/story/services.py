@@ -2,7 +2,7 @@ import pandas as pd
 import json
 from typing import Dict, List
 from langchain_community.chat_models import ChatOpenAI
-from src.prompt.story_point_estimation import story_point_estimation_prompt
+from story_point.prompts import story_point_estimation_prompt
 
 
 class StoryPointAgent:

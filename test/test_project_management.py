@@ -1,8 +1,13 @@
 import pytest
 import tempfile
 import csv
-from src.services.project_management_orchestrator import ProjectManagementOrchestrator
-from src.services.story_point_agent import StoryPointAgent
+import sys
+import os
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../src'))
+
+from project.services import ProjectManagementOrchestrator
+from story.services import StoryPointAgent
 
 
 @pytest.fixture

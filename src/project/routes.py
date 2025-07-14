@@ -3,8 +3,8 @@ from pydantic import BaseModel
 from typing import List, Optional
 import tempfile
 import os
-from src.services.project_management_orchestrator import ProjectManagementOrchestrator
-from src.models.models import TaskListInput
+from project.services import ProjectManagementOrchestrator
+from project.models import TaskListInput
 
 
 router = APIRouter()
@@ -122,18 +122,3 @@ async def classify_tasks_only(task_list: TaskListInput):
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Classification failed: {str(e)}")
-
-
-@router.get("/health",
-            summary="헬스 체크",
-            description="서비스 상태를 확인합니다.")
-async def health_check():
-    """
-    서비스 상태를 확인합니다.
-    """
-    return {
-        "status": "healthy",
-        "epic_agent": "ready",
-        "story_point_agent": "ready",
-        "reference_data_loaded": orchestrator.point_agent.reference_data is not None
-    }

@@ -1,7 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import List
 
-
 class TaskInput(BaseModel):
     task: str = Field(..., description="업무 내용")
 
