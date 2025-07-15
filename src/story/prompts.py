@@ -11,7 +11,9 @@ STORY_GENERATOR_PROMPT = ChatPromptTemplate.from_messages(
           - Story는 하나의 스프린트 기간 내에 완료될 수 있는 작업 단위여야 한다.
           - 불필요한 설명, 주석, 마크다운 없이 JSON만 출력한다.
           - 최대 {max_storys}개의 Story을 생성한다.
+          - 해당 에픽을 완수하기 위한 최소한의 Story만을 생성한다.
           - acceptance_criteria는 구체적으고 측정 가능한 기준으로 작성한다.
+          - 에픽에 테스트에 대한 내용이 없으면 테스트 항목은 제외한다.
         [Process]
         1. Epic 분석: 주어진 Epic의 범위와 목표를 파악한다
         2. Story 도출: Epic을 완료하기 위해 필요한 독립적인 작업 단위들을 식별한다

@@ -1,142 +1,198 @@
-import pandas as pd
 import json
+import logging
 from typing import Dict, List
+
 from langchain_community.chat_models import ChatOpenAI
-from story_point.prompts import story_point_estimation_prompt
+from langchain.prompts import ChatPromptTemplate
+
+from story.prompts import STORY_GENERATOR_PROMPT
+from story.models import Story, StoryRequest, ProcessingStatus
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
-class StoryPointAgent:
-    def __init__(self, model_name: str = "gpt-4o-mini", temperature: float = 0.2):
-        self.llm = ChatOpenAI(model=model_name, temperature=temperature)
-        self.prompt = story_point_estimation_prompt
-        self.reference_data = None
+class StoryGeneratorAgent:
+    """스토리 생성 agent"""
     
-    def load_reference_csv(self, csv_path: str) -> bool:
-        """CSV 파일에서 참고 스토리 데이터를 로드합니다."""
-        try:
-            self.reference_data = pd.read_csv(csv_path)
-            print(f"Reference data loaded: {len(self.reference_data)} stories")
-            return True
-        except Exception as e:
-            print(f"Failed to load CSV: {e}")
-            return False
-    
-    def get_reference_stories_by_area(self, area: str) -> List[Dict]:
-        """특정 영역의 참고 스토리들을 반환합니다."""
-        if self.reference_data is None:
-            return []
-        
-        area_stories = self.reference_data[
-            self.reference_data['area'].str.lower() == area.lower()
-        ]
-        
-        reference_stories = []
-        for _, row in area_stories.iterrows():
-            reference_stories.append({
-                'title': row.get('title', ''),
-                'description': row.get('description', ''),
-                'point': row.get('point', 0),
-                'area': row.get('area', '')
-            })
-        
-        return reference_stories
-    
-    def estimate_story_point(self, story: Dict, area: str = None) -> Dict:
-        """스토리 포인트를 추정합니다."""
-        # area가 지정되지 않은 경우 스토리의 area 사용
-        if area is None:
-            area = story.get('area', '')
-        
-        # 참고 스토리들 가져오기
-        reference_stories = self.get_reference_stories_by_area(area)
-        
-        # 참고 스토리가 없는 경우 기본 추정
-        if not reference_stories:
-            return {
-                "estimated_point": 3,
-                "reasoning": "참고할 수 있는 동일 영역의 스토리가 없어 기본값으로 추정했습니다.",
-                "complexity_factors": ["참고 데이터 부족"],
-                "similar_stories": [],
-                "confidence_level": "low"
-            }
-        
-        # 스토리 정보 포맷팅
-        story_text = f"""
-제목: {story.get('title', '')}
-설명: {story.get('description', '')}
-영역: {story.get('area', '')}
-완료조건: {', '.join(story.get('acceptance_criteria', []))}
-"""
-        
-        # 참고 스토리들 포맷팅
-        reference_text = ""
-        for ref in reference_stories:
-            reference_text += f"""
-- 제목: {ref['title']}
-  설명: {ref['description']}
-  포인트: {ref['point']}
-  
-"""
-        
-        # LLM에 질의
-        formatted_prompt = self.prompt.format(
-            story=story_text,
-            reference_stories=reference_text
+    def __init__(self, openai_api_key: str,  model_name: str = "gpt-4o-mini", temperature: float = 0.2):
+        self.llm = ChatOpenAI(
+            model=model_name,
+            temperature=temperature,
+            api_key=openai_api_key
         )
-        
+        self.processing_tasks: Dict[str, ProcessingStatus] = {}
+
+    def _generate_storys_with_llm(self, prompt: ChatPromptTemplate, user_input: str, epic_info: str, max_storys: int) -> str:
+        """LLM을 사용하여 스토리 생성"""
         try:
-            response = self.llm.predict(formatted_prompt)
-            result = self.parse_estimation_response(response)
-            print(f"Story point estimation: {result}")
-            return result
+            logger.info("스토리 생성 시작")
+            
+            prompt = prompt.format(
+                user_input=user_input,
+                epic_info=epic_info,
+                max_storys=max_storys
+            )
+            
+            response = self.llm.invoke(prompt)
+            logger.info("스토리 생성 완료")
+            return response.content
+            
         except Exception as e:
-            print(f"Estimation failed: {e}")
-            return {
-                "estimated_point": 3,
-                "reasoning": f"추정 중 오류 발생: {str(e)}",
-                "complexity_factors": ["오류 발생"],
-                "similar_stories": [],
-                "confidence_level": "low"
-            }
-    
-    def parse_estimation_response(self, response: str) -> Dict:
-        """LLM 응답을 파싱합니다."""
+            logger.error(f"스토리 생성 중 오류: {str(e)}")
+            raise e
+
+    def _parse_response(self, raw_response: str) -> List[Dict]:
+        """응답 파싱"""
         try:
-            # JSON 응답에서 코드 블록 제거
-            content = response.strip()
-            if content.startswith("```json"):
-                content = content[7:-3].strip()
-            elif content.startswith("```"):
-                content = content[3:-3].strip()
+            logger.info("응답 파싱 시작")
             
-            # JSON 파싱
-            parsed_data = json.loads(content)
+            # JSON 파싱 시도
+            try:
+                parsed_data = json.loads(raw_response)
+                return parsed_data
+            except json.JSONDecodeError:
+                # JSON 추출 시도
+                import re
+                json_pattern = r'\[.*\]'
+                match = re.search(json_pattern, raw_response, re.DOTALL)
+                if match:
+                    json_str = match.group(0)
+                    parsed_data = json.loads(json_str)
+                    return parsed_data
+                else:
+                    logger.error(f"유효하지 않은 형태의 raw_response : {raw_response}")
+                    raise ValueError("유효한 JSON을 찾을 수 없음")
             
-            # 유효성 검증
-            valid_points = [1, 2, 3, 5, 8]
-            if parsed_data.get('estimated_point') not in valid_points:
-                parsed_data['estimated_point'] = 3
+        except Exception as e:
+            logger.error(f"응답 파싱 중 오류: {str(e)}")
+            raise e
+
+### 추후 개선    
+    # def _validate_storys(self, parsed_storys: List[Dict]) -> List[Story]:
+    #     """스토리 검증 및 변환"""
+    #     try:
+    #         logger.info("에픽 검증 시작")
             
-            return parsed_data
+    #         validated_epics = []
+    #         for story_data in parsed_storys:
+    #             try:
+    #                 # 직접 구조 처리 (중첩 구조 제거)
+    #                 epic_info = epic_data
+                    
+    #                 # 필수 필드 확인 및 기본값 설정
+    #                 title = epic_info.get("title", "제목 없음")
+    #                 description = epic_info.get("description", "설명 없음")
+    #                 business_value = epic_info.get("business_value", "비즈니스 가치 미정의")
+    #                 priority = epic_info.get("priority", "Medium")
+    #                 acceptance_criteria = epic_info.get("acceptance_criteria", [])
+                    
+                    
+
+    #                 # 수락 기준이 문자열인 경우 리스트로 변환
+    #                 if isinstance(acceptance_criteria, str):
+    #                     acceptance_criteria = [acceptance_criteria]
+                    
+    #                 # 기본 수락 기준 추가 (비어있는 경우)
+    #                 if not acceptance_criteria:
+    #                     acceptance_criteria = [
+    #                         f"{title} 기능이 정상적으로 동작한다",
+    #                         "사용자 테스트를 통과한다",
+    #                         "성능 요구사항을 만족한다"
+    #                     ]
+                    
+    #                 epic = Story(
+    #                     title=title,
+    #                     description=description,
+    #                     business_value=business_value,
+    #                     priority=priority,
+    #                     acceptance_criteria=acceptance_criteria,
+    #                 )
+    #                 validated_epics.append(epic)
+                    
+    #             except Exception as e:
+    #                 logger.warning(f"에픽 검증 실패: {str(e)}")
+    #                 logger.warning(f"문제가 된 데이터: {epic_data}")
+    #                 continue
             
-        except json.JSONDecodeError as e:
-            print(f"JSON parsing failed: {e}")
-            print(f"Raw response: {response}")
-            return {
-                "estimated_point": 3,
-                "reasoning": "응답 파싱 실패로 기본값 적용",
-                "complexity_factors": ["파싱 오류"],
-                "similar_stories": [],
-                "confidence_level": "low"
-            }
+    #         logger.info(f"검증 완료: {len(validated_epics)}개 에픽")
+    #         return validated_epics
+            
+    #     except Exception as e:
+    #         logger.error(f"에픽 검증 중 오류: {str(e)}")
+    #         raise e
     
-    def estimate_multiple_stories(self, stories: List[Dict]) -> List[Dict]:
-        """여러 스토리의 포인트를 일괄 추정합니다."""
-        results = []
-        for story in stories:
-            estimation = self.estimate_story_point(story)
-            story_with_estimation = story.copy()
-            story_with_estimation.update(estimation)
-            results.append(story_with_estimation)
+    # def _create_fallback_epic(self, user_input: str) -> List[Epic]:
+    #     """기본 에픽 생성 (fallback)"""
+    #     logger.info("기본 에픽 생성")
         
-        return results
+    #     fallback_epic = Epic(
+    #         title="기본 에픽",
+    #         description=f"에픽 생성에 실패하여 기본 에픽을 생성했습니다. 사용자 요청: {user_input}",
+    #         business_value="기본 비즈니스 가치",
+    #         priority="Medium",
+    #         acceptance_criteria=[
+    #             "기본 기능이 정상적으로 동작한다",
+    #             "사용자 요구사항을 만족한다",
+    #             "테스트를 통과한다"
+    #         ]
+    #     )
+    #     return [fallback_epic]
+        
+    async def generate_storys(self, request: StoryRequest) -> List[Story]:
+        """에픽 생성 (동기)"""
+        try:
+            # 1. LLM으로 에픽 생성
+            raw_response = self._generate_storys_with_llm(
+                STORY_GENERATOR_PROMPT,
+                request.user_input,
+                request.epic_info,
+                request.max_storys
+            )
+            
+
+            # 2. 응답 파싱
+            parsed_epics = self._parse_response(raw_response)
+            
+            # # 3. 에픽 검증 및 변환
+            # validated_epics = self._validate_epics(parsed_epics)
+            
+            # # 4. 결과가 없으면 기본 에픽 생성
+            # if not validated_epics:
+            #     validated_epics = self._create_fallback_epic(request.user_input)
+            
+            return parsed_epics
+            
+        except Exception as e:
+            logger.error(f"스토리 생성 중 오류: {str(e)}")
+            # 오류 발생 시 기본 에픽 반환
+            return None
+        
+    async def generate_storys_async(self, request: StoryRequest, task_id: str):
+        """에픽 생성 (비동기)"""
+        try:
+            # 상태 업데이트
+            self.processing_tasks[task_id] = ProcessingStatus(
+                task_id=task_id,
+                status="processing",
+                message="스토리 생성 중..."
+            )
+            
+            epics = await self.generate_storys(request)
+            
+            # 완료 상태 업데이트
+            self.processing_tasks[task_id] = ProcessingStatus(
+                task_id=task_id,
+                status="completed",
+                message="스토리 생성 완료",
+                result=epics
+            )
+            
+        except Exception as e:
+            logger.error(f"비동기 스토리 생성 오류: {str(e)}")
+            self.processing_tasks[task_id] = ProcessingStatus(
+                task_id=task_id,
+                status="failed",
+                message="스토리 생성 실패",
+                error=str(e)
+            )

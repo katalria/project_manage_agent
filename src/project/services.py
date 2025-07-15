@@ -3,7 +3,7 @@ import os
 import glob
 from datetime import datetime
 from epic.services import EpicGeneratorAgent
-from story.services import StoryPointAgent
+from story.services import StoryGeneratorAgent
 
 
 class ProjectManagementOrchestrator:
@@ -15,13 +15,14 @@ class ProjectManagementOrchestrator:
                  model_name: str = "gpt-4o-mini", 
                  temperature: float = 0.2,
                  reference_csv_path: Optional[str] = None):
+        return None
         # self.epic_agent = EpicGeneratorAgent(model_name, temperature)
-        self.point_agent = StoryPointAgent(model_name, temperature)
+        # self.point_agent = StoryGeneratorAgent(model_name, temperature)
         
         # 참고 CSV 파일 로드
-        csv_path = reference_csv_path or self._get_latest_reference_csv()
-        if csv_path:
-            self.load_reference_data(csv_path)
+        # csv_path = reference_csv_path or self._get_latest_reference_csv()
+        # if csv_path:
+        #     self.load_reference_data(csv_path)
     
     def _get_latest_reference_csv(self) -> Optional[str]:
         """./data/ 디렉토리에서 가장 최근의 story_reference_yymmdd.csv 파일을 찾습니다."""

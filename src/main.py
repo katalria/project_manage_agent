@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from dotenv import load_dotenv
 
 from epic.routes import router as epic_generator_route
-from project.routes import router as project_management_route
+from story.routes import router as story_generator_route
 load_dotenv()
 
 app = FastAPI(
@@ -13,7 +13,8 @@ app = FastAPI(
 )
 
 app.include_router(epic_generator_route, prefix="/epic_generator")
-app.include_router(project_management_route, prefix="/project_management")
+app.include_router(story_generator_route, prefix="/story_generator")
+
 
 @app.get("/health")
 async def health_check():

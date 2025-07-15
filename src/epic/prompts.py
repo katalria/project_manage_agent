@@ -54,13 +54,6 @@ TASK_TO_EPIC_CONVERTER_PROMPT = ChatPromptTemplate.from_messages(
           - acceptance_criteria는 그룹핑된 업무들을 기반으로 구체적이고 측정 가능한 기준으로 작성한다.
           - 개발자의 업무 영역만 작성한다.
           - 각 Epic의 included_tasks에는 해당 Epic에 포함된 원본 업무들을 나열한다.
-        [Grouping Rules]
-          - UI/UX 관련 업무들은 하나의 Epic으로 그룹핑
-          - 데이터베이스/백엔드 API 관련 업무들은 하나의 Epic으로 그룹핑  
-          - 인증/보안 관련 업무들은 하나의 Epic으로 그룹핑
-          - 특정 기능(예: 결제, 알림, 검색 등) 관련 업무들은 각각 하나의 Epic으로 그룹핑
-          - 배포/인프라 관련 업무들은 하나의 Epic으로 그룹핑
-          - 테스트 관련 업무들은 해당 기능 Epic에 포함하거나 별도 Epic으로 그룹핑
         [Output Format]
         [
           {{

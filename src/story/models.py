@@ -4,7 +4,6 @@ from datetime import datetime
 import uuid
 
 from epic.models import Epic
-from project.models import P
 
 
 class Story(BaseModel):
