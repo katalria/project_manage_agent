@@ -1,0 +1,25 @@
+2025-07-14T11:43:17.379410+09:00 - epic.routes - ERROR - 에픽 생성 오류: 1 validation error for Epic
+included_tasks
+  Field required [type=missing, input_value={'title': '기본 에픽'...트를 통과한다']}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-07-14T11:45:15.856364+09:00 - epic.routes - ERROR - 동기 업무 - 에픽 변환 생성: 1 validation error for Epic
+included_tasks
+  Field required [type=missing, input_value={'title': '기본 에픽'...트를 통과한다']}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-07-14T11:46:36.429888+09:00 - epic.routes - ERROR - 동기 업무 - 에픽 변환 생성: 1 validation error for Epic
+included_tasks
+  Field required [type=missing, input_value={'title': '기본 에픽'...트를 통과한다']}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-07-14T11:48:10.070940+09:00 - epic.routes - ERROR - 동기 업무 - 에픽 변환 생성: 1 validation error for Epic
+included_tasks
+  Field required [type=missing, input_value={'title': '기본 에픽'...트를 통과한다']}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-07-14T17:47:15.508577+09:00 - story.routes - ERROR - 스토리 생성 오류: 'StoryGeneratorAgent' object has no attribute '_create_fallback_epic'
+2025-07-14T17:50:23.783187+09:00 - story.routes - ERROR - 스토리 생성 오류: 'StoryGeneratorAgent' object has no attribute '_create_fallback_epic'
+2025-07-14T17:51:35.431431+09:00 - story.routes - ERROR - 스토리 생성 오류: object of type 'NoneType' has no len()
+2025-07-14T17:52:31.909773+09:00 - story.routes - ERROR - 스토리 생성 오류: object of type 'NoneType' has no len()
+2025-07-14T17:54:28.540815+09:00 - story.routes - ERROR - 스토리 생성 오류: object of type 'NoneType' has no len()
+2025-07-14T17:55:43.603508+09:00 - story.routes - ERROR - 스토리 생성 오류: 1 validation error for StoryResponse
+storys
+  Field required [type=missing, input_value={'epics': [{'title': '환...eration_time': 9.804588}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing

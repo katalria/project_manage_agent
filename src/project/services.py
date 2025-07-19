@@ -1,6 +1,9 @@
 from typing import List, Dict, Optional
-from src.services.epic_detection_agent import EpicDetectionAgent
-from src.services.story_point_agent import StoryPointAgent
+import os
+import glob
+from datetime import datetime
+from epic.services import EpicGeneratorAgent
+from story.services import StoryGeneratorAgent
 
 
 class ProjectManagementOrchestrator:
@@ -12,13 +15,48 @@ class ProjectManagementOrchestrator:
                  model_name: str = "gpt-4o-mini", 
                  temperature: float = 0.2,
                  reference_csv_path: Optional[str] = None):
-        self.epic_agent = EpicDetectionAgent(model_name, temperature)
-        self.point_agent = StoryPointAgent(model_name, temperature)
+        return None
+        # self.epic_agent = EpicGeneratorAgent(model_name, temperature)
+        # self.point_agent = StoryGeneratorAgent(model_name, temperature)
         
-        # 참고 CSV 파일이 있다면 로드
-        if reference_csv_path:
-            self.load_reference_data(reference_csv_path)
+        # 참고 CSV 파일 로드
+        # csv_path = reference_csv_path or self._get_latest_reference_csv()
+        # if csv_path:
+        #     self.load_reference_data(csv_path)
     
+    def _get_latest_reference_csv(self) -> Optional[str]:
+        """./data/ 디렉토리에서 가장 최근의 story_reference_yymmdd.csv 파일을 찾습니다."""
+        data_dir = "./data"
+        if not os.path.exists(data_dir):
+            return None
+        
+        # story_reference_*.csv 패턴으로 파일 검색
+        pattern = os.path.join(data_dir, "story_reference_*.csv")
+        csv_files = glob.glob(pattern)
+        
+        if not csv_files:
+            return None
+        
+        # 파일명에서 날짜 추출하여 가장 최근 파일 선택
+        latest_file = None
+        latest_date = None
+        
+        for file_path in csv_files:
+            filename = os.path.basename(file_path)
+            # story_reference_yymmdd.csv 형태에서 날짜 부분 추출
+            if filename.startswith("story_reference_") and filename.endswith(".csv"):
+                date_part = filename[16:-4]  # "story_reference_"와 ".csv" 제거
+                try:
+                    # yymmdd 형태를 datetime으로 변환
+                    file_date = datetime.strptime(date_part, "%y%m%d")
+                    if latest_date is None or file_date > latest_date:
+                        latest_date = file_date
+                        latest_file = file_path
+                except ValueError:
+                    continue
+        
+        return latest_file
+
     def load_reference_data(self, csv_path: str) -> bool:
         """참고 스토리 데이터를 로드합니다."""
         return self.point_agent.load_reference_csv(csv_path)
