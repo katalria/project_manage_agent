@@ -51,6 +51,7 @@ TASK_TO_EPIC_CONVERTER_PROMPT = ChatPromptTemplate.from_messages(
           - Epic은 하나 이상의 스프린트에 걸쳐 진행되는 큰 기능 단위여야 한다.
           - 불필요한 설명, 주석, 마크다운 없이 JSON만 출력한다.
           - 최대 {max_epics}개의 Epic을 생성한다.
+          - 각 업무들로 에픽을 구성할 때 최소한의 에픽으로 구성한다
           - acceptance_criteria는 그룹핑된 업무들을 기반으로 구체적이고 측정 가능한 기준으로 작성한다.
           - 개발자의 업무 영역만 작성한다.
           - 각 Epic의 included_tasks에는 해당 Epic에 포함된 원본 업무들을 나열한다.

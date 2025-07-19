@@ -5,7 +5,7 @@ import os
 
 from utils.logger import get_logger
 from story.services import StoryGeneratorAgent
-from story.models import StoryRequest, StoryResponse, ProcessingStatus
+from story.models import StoryRequest, StoryResponse, StoryProcessingStatus
 
 router = APIRouter(prefix="/Story", tags=["Story"])
 
@@ -45,7 +45,7 @@ async def generate_storys_async(request: StoryRequest, background_tasks: Backgro
         task_id = str(uuid4())
         
         # 초기 상태 설정
-        story_service.processing_tasks[task_id] = ProcessingStatus(
+        story_service.processing_tasks[task_id] = StoryProcessingStatus(
             task_id=task_id,
             status="pending",
             message="스토리 생성 대기 중..."

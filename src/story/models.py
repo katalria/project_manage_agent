@@ -14,6 +14,9 @@ class Story(BaseModel):
     description: str = Field(..., min_length=1)
     acceptance_criteria: List[str] = Field(default_factory=list)
     story_points: Optional[int] = Field(None, ge=0, description="스토리 포인트")
+    domain: Optional[str] = Field(None, description="개발 영역 (frontend, backend, api, db 등)")
+    story_type: Optional[str] = Field(None, description="스토리 타입 (feature, bug, refactor 등)")
+    tags: List[str] = Field(default_factory=list, description="관련 키워드 태그")
     created_at: datetime = Field(default_factory=datetime.now)
     updated_at: datetime = Field(default_factory=datetime.now)
 
@@ -32,7 +35,7 @@ class StoryResponse(BaseModel):
     generation_time: float
 
 
-class ProcessingStatus(BaseModel):
+class StoryProcessingStatus(BaseModel):
     """처리 상태 모델"""
     task_id: str
     status: str  # "pending", "processing", "completed", "failed"

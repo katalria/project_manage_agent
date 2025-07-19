@@ -6,7 +6,7 @@ from langchain_community.chat_models import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
 
 from story.prompts import STORY_GENERATOR_PROMPT
-from story.models import Story, StoryRequest, ProcessingStatus
+from story.models import Story, StoryRequest, StoryProcessingStatus
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -21,7 +21,7 @@ class StoryGeneratorAgent:
             temperature=temperature,
             api_key=openai_api_key
         )
-        self.processing_tasks: Dict[str, ProcessingStatus] = {}
+        self.processing_tasks: Dict[str, StoryProcessingStatus] = {}
 
     def _generate_storys_with_llm(self, prompt: ChatPromptTemplate, user_input: str, epic_info: str, max_storys: int) -> str:
         """LLM을 사용하여 스토리 생성"""
@@ -152,47 +152,51 @@ class StoryGeneratorAgent:
             
 
             # 2. 응답 파싱
-            parsed_epics = self._parse_response(raw_response)
+            parsed_storys = self._parse_response(raw_response)
             
-            # # 3. 에픽 검증 및 변환
-            # validated_epics = self._validate_epics(parsed_epics)
+            # 3. 스토리 검증 및 변환
+            # validated_storys = self._validate_storys(parsed_storys)
             
-            # # 4. 결과가 없으면 기본 에픽 생성
-            # if not validated_epics:
-            #     validated_epics = self._create_fallback_epic(request.user_input)
+            # 4. 결과가 없으면 기본 스토리 생성
+            # if not validated_storys:
+            #     validated_storys = self._create_fallback_story(request.user_input)
             
-            return parsed_epics
+            return parsed_storys
             
         except Exception as e:
             logger.error(f"스토리 생성 중 오류: {str(e)}")
-            # 오류 발생 시 기본 에픽 반환
-            return None
+            # 오류 발생 시 기본 스토리 반환
+            return self._create_fallback_story(request.user_input)
         
     async def generate_storys_async(self, request: StoryRequest, task_id: str):
-        """에픽 생성 (비동기)"""
+        """스토리 생성 (비동기)"""
         try:
             # 상태 업데이트
-            self.processing_tasks[task_id] = ProcessingStatus(
+            self.processing_tasks[task_id] = StoryProcessingStatus(
                 task_id=task_id,
                 status="processing",
                 message="스토리 생성 중..."
             )
             
-            epics = await self.generate_storys(request)
+            storys = await self.generate_storys(request)
             
             # 완료 상태 업데이트
-            self.processing_tasks[task_id] = ProcessingStatus(
+            self.processing_tasks[task_id] = StoryProcessingStatus(
                 task_id=task_id,
                 status="completed",
                 message="스토리 생성 완료",
-                result=epics
+                result=storys
             )
             
         except Exception as e:
             logger.error(f"비동기 스토리 생성 오류: {str(e)}")
-            self.processing_tasks[task_id] = ProcessingStatus(
+            self.processing_tasks[task_id] = StoryProcessingStatus(
                 task_id=task_id,
                 status="failed",
                 message="스토리 생성 실패",
                 error=str(e)
             )
+    
+    def get_task_status(self, task_id: str) -> StoryProcessingStatus:
+        """작업 상태 조회"""
+        return self.processing_tasks.get(task_id)

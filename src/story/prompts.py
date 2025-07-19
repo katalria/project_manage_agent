@@ -14,6 +14,9 @@ STORY_GENERATOR_PROMPT = ChatPromptTemplate.from_messages(
           - 해당 에픽을 완수하기 위한 최소한의 Story만을 생성한다.
           - acceptance_criteria는 구체적으고 측정 가능한 기준으로 작성한다.
           - 에픽에 테스트에 대한 내용이 없으면 테스트 항목은 제외한다.
+          - domain은 해당 스토리의 주요 개발 영역을 명시한다.
+          - story_type은 스토리의 성격을 분류한다.
+          - tags는 관련 기술스택, 기능영역, 키워드를 포함한다.
         [Process]
         1. Epic 분석: 주어진 Epic의 범위와 목표를 파악한다
         2. Story 도출: Epic을 완료하기 위해 필요한 독립적인 작업 단위들을 식별한다
@@ -24,9 +27,10 @@ STORY_GENERATOR_PROMPT = ChatPromptTemplate.from_messages(
           {{
             "title": "스토리 제목",
             "description": "스토리 설명", 
-            "business_value": "비즈니스 가치",
-            "priority": "High|Medium|Low",
             "acceptance_criteria": ["수락 기준 1", "수락 기준 2", "수락 기준 3"],
+            "domain":  "frontend|backend|devops|data",
+            "story_type": "feature|bug|refactor|enhancement|documentation",
+            "tags": ["관련 키워드", "기술스택", "기능영역"]
           }},
         ]
         """

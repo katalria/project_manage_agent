@@ -1,13 +1,12 @@
 import json
 import logging
 from typing import Dict, Optional, List
-from uuid import uuid4
 
 from langchain_community.chat_models import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
 
 from epic.prompts import EPIC_GENERATOR_PROMPT, TASK_TO_EPIC_CONVERTER_PROMPT
-from epic.models import ProcessingStatus, Epic, EpicRequest
+from epic.models import EpicProcessingStatus, Epic, EpicRequest
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -22,7 +21,7 @@ class EpicGeneratorAgent:
             temperature=0.3,
             api_key=openai_api_key
         )
-        self.processing_tasks: Dict[str, ProcessingStatus] = {}
+        self.processing_tasks: Dict[str, EpicProcessingStatus] = {}
     
     def _generate_epics_with_llm(self, prompt: ChatPromptTemplate, user_input: str, project_info: str, max_epics: int) -> str:
         """LLM을 사용하여 에픽 생성"""
@@ -175,7 +174,7 @@ class EpicGeneratorAgent:
         """에픽 생성 (비동기)"""
         try:
             # 상태 업데이트
-            self.processing_tasks[task_id] = ProcessingStatus(
+            self.processing_tasks[task_id] = EpicProcessingStatus(
                 task_id=task_id,
                 status="processing",
                 message="에픽 생성 중..."
@@ -184,7 +183,7 @@ class EpicGeneratorAgent:
             epics = await self.generate_epics(request)
             
             # 완료 상태 업데이트
-            self.processing_tasks[task_id] = ProcessingStatus(
+            self.processing_tasks[task_id] = EpicProcessingStatus(
                 task_id=task_id,
                 status="completed",
                 message="에픽 생성 완료",
@@ -193,7 +192,7 @@ class EpicGeneratorAgent:
             
         except Exception as e:
             logger.error(f"비동기 에픽 생성 오류: {str(e)}")
-            self.processing_tasks[task_id] = ProcessingStatus(
+            self.processing_tasks[task_id] = EpicProcessingStatus(
                 task_id=task_id,
                 status="failed",
                 message="에픽 생성 실패",
@@ -230,7 +229,7 @@ class EpicGeneratorAgent:
             # 오류 발생 시 기본 에픽 반환
             return self._create_fallback_epic(request.user_input)
     
-    def get_task_status(self, task_id: str) -> Optional[ProcessingStatus]:
+    def get_task_status(self, task_id: str) -> Optional[EpicProcessingStatus]:
         """작업 상태 조회"""
         return self.processing_tasks.get(task_id)
     

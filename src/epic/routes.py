@@ -5,7 +5,7 @@ import os
 
 from utils.logger import get_logger
 from epic.services import EpicGeneratorAgent
-from epic.models import EpicRequest, EpicResponse, ProcessingStatus
+from epic.models import EpicRequest, EpicResponse, EpicProcessingStatus
 
 router = APIRouter(prefix="/epic", tags=["Epic"])
 
@@ -45,7 +45,7 @@ async def generate_epics_async(request: EpicRequest, background_tasks: Backgroun
         task_id = str(uuid4())
         
         # 초기 상태 설정
-        epic_service.processing_tasks[task_id] = ProcessingStatus(
+        epic_service.processing_tasks[task_id] = EpicProcessingStatus(
             task_id=task_id,
             status="pending",
             message="에픽 생성 대기 중..."

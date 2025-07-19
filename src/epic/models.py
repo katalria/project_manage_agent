@@ -31,7 +31,7 @@ class EpicResponse(BaseModel):
     generation_time: float
 
 
-class ProcessingStatus(BaseModel):
+class EpicProcessingStatus(BaseModel):
     """처리 상태 모델"""
     task_id: str
     status: str  # "pending", "processing", "completed", "failed"

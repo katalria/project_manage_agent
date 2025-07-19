@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 
 from epic.routes import router as epic_generator_route
 from story.routes import router as story_generator_route
+from story_point.routes import router as story_point_estimator_route
+from workflow.routes import router as workflow_generator_route
 load_dotenv()
 
 app = FastAPI(
@@ -14,6 +16,8 @@ app = FastAPI(
 
 app.include_router(epic_generator_route, prefix="/epic_generator")
 app.include_router(story_generator_route, prefix="/story_generator")
+app.include_router(story_point_estimator_route, prefix="/story_point_estimator")
+app.include_router(workflow_generator_route, prefix="/workflow_generator")
 
 
 @app.get("/health")
