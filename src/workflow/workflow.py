@@ -1,7 +1,7 @@
 import logging
 import os
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 from langgraph.graph import StateGraph, END
 from langchain_core.runnables import RunnableConfig
@@ -13,7 +13,7 @@ from story.models import StoryRequest
 from story_point.services import StoryPointEstimationAgent
 from story_point.models import StoryPointRequest
 
-from workflow.models import ProjectManagementState, WorkflowRequest, WorkflowResponse, WorkflowProcessingStatus, EpicWithStoriesAndEstimations
+from workflow.models import ProjectManagementState, WorkflowRequest, WorkflowResponse, EpicWithStoriesAndEstimations
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -30,8 +30,6 @@ class ProjectManagementWorkflow:
         self.story_agent = StoryGeneratorAgent(openai_api_key)
         self.story_point_agent = StoryPointEstimationAgent(openai_api_key)
         
-        # 처리 중인 작업들
-        self.processing_tasks: Dict[str, WorkflowProcessingStatus] = {}
         
         # 워크플로우 그래프 생성
         self.workflow = self._create_workflow()
@@ -79,7 +77,7 @@ class ProjectManagementWorkflow:
         logger.info("워크플로우 초기화 완료")
         return state
     
-    async def _generate_epics(self, state: ProjectManagementState) -> ProjectManagementState:
+    def _generate_epics(self, state: ProjectManagementState) -> ProjectManagementState:
         """에픽 생성 단계"""
         step_start = datetime.now()
         logger.info("에픽 생성 단계 시작")
@@ -90,7 +88,7 @@ class ProjectManagementWorkflow:
             # 에픽 생성
             epic_request = state["epic_request"]
             logger.info(f"에픽 생성 요청 메세지: {epic_request}")
-            epics = await self.epic_agent.generate_epics(epic_request)
+            epics = self.epic_agent.generate_epics(epic_request)
             
             if not epics:
                 error_msg = "에픽 생성 실패"
@@ -108,7 +106,7 @@ class ProjectManagementWorkflow:
         state["step_times"]["generate_epics"] = (datetime.now() - step_start).total_seconds()
         return state
     
-    async def _generate_stories(self, state: ProjectManagementState) -> ProjectManagementState:
+    def _generate_stories(self, state: ProjectManagementState) -> ProjectManagementState:
         """스토리 생성 단계"""
         step_start = datetime.now()
         logger.info("스토리 생성 단계 시작")
@@ -137,7 +135,7 @@ class ProjectManagementWorkflow:
                     state["story_requests"].append(story_request)
                     
                     # 스토리 생성
-                    stories = await self.story_agent.generate_storys(story_request)
+                    stories = self.story_agent.generate_storys(story_request)
                     
                     if stories:
                         # 스토리를 Story 객체로 변환하고 epic_id 설정
@@ -182,7 +180,7 @@ class ProjectManagementWorkflow:
         state["step_times"]["generate_stories"] = (datetime.now() - step_start).total_seconds()
         return state
     
-    async def _estimate_story_points(self, state: ProjectManagementState) -> ProjectManagementState:
+    def _estimate_story_points(self, state: ProjectManagementState) -> ProjectManagementState:
         """스토리 포인트 추정 단계"""
         step_start = datetime.now()
         logger.info("스토리 포인트 추정 단계 시작")
@@ -221,7 +219,7 @@ class ProjectManagementWorkflow:
                     state["story_point_requests"].append(story_point_request)
                     
                     # 스토리 포인트 추정
-                    estimations = await self.story_point_agent.estimate_story_points(story_point_request)
+                    estimations = self.story_point_agent.estimate_story_points(story_point_request)
                     
                     if estimations:
                         all_estimations.extend(estimations)
@@ -264,7 +262,7 @@ class ProjectManagementWorkflow:
         
         return state
     
-    async def execute_workflow(self, request: WorkflowRequest) -> WorkflowResponse:
+    def execute_workflow(self, request: WorkflowRequest) -> WorkflowResponse:
         """워크플로우 실행 (동기)"""
         start_time = datetime.now()
         
@@ -288,7 +286,7 @@ class ProjectManagementWorkflow:
             }
             
             # 워크플로우 실행
-            final_state = await self.workflow.ainvoke(initial_state)
+            final_state = self.workflow.invoke(initial_state)
             
             # 실행 시간 계산
             execution_time = (datetime.now() - start_time).total_seconds()
@@ -322,41 +320,6 @@ class ProjectManagementWorkflow:
                 total_estimations=0,
                 execution_time=execution_time,
                 workflow_status="failed"
-            )
-    
-    async def execute_workflow_async(self, request: WorkflowRequest, task_id: str):
-        """워크플로우 비동기 실행"""
-        try:
-            # 상태 업데이트
-            self.processing_tasks[task_id] = WorkflowProcessingStatus(
-                task_id=task_id,
-                status="processing",
-                current_step="initialize",
-                message="워크플로우 실행 중...",
-                progress=0
-            )
-            
-            result = await self.execute_workflow(request)
-            
-            # 완료 상태 업데이트
-            self.processing_tasks[task_id] = WorkflowProcessingStatus(
-                task_id=task_id,
-                status="completed",
-                current_step="finalize",
-                message="워크플로우 실행 완료",
-                progress=100,
-                result=result
-            )
-            
-        except Exception as e:
-            logger.error(f"비동기 워크플로우 실행 오류: {str(e)}")
-            self.processing_tasks[task_id] = WorkflowProcessingStatus(
-                task_id=task_id,
-                status="failed",
-                current_step="error",
-                message="워크플로우 실행 실패",
-                progress=0,
-                error=str(e)
             )
     
     def _group_results_by_epic(self, epics, stories, estimations):
@@ -395,7 +358,3 @@ class ProjectManagementWorkflow:
             epic_results.append(epic_result)
         
         return epic_results
-
-    def get_task_status(self, task_id: str) -> Optional[WorkflowProcessingStatus]:
-        """작업 상태 조회"""
-        return self.processing_tasks.get(task_id)

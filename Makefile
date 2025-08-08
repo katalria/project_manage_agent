@@ -63,7 +63,7 @@ dev-debug:
 	poetry run uvicorn src.main:app --reload --host 0.0.0.0 --port 8000 --log-level debug
 
 docker-up:
-	docker compose -f docker/docker-compose.yaml up -d
+	docker compose -f docker/docker-compose.yaml up
 
 docker-build:
 	docker compose -f docker/docker-compose.yaml up -d --build

@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List, Optional, Dict, Any, TypedDict
+from typing import List, Optional, Dict, Any
 
 from story.models import Story
 from epic.models import Epic
@@ -34,23 +34,3 @@ class StoryPointResponse(BaseModel):
     generation_time: float
 
 
-class StoryPointProcessingStatus(BaseModel):
-    """처리 상태 모델"""
-    task_id: str
-    status: str  # "pending", "processing", "completed", "failed"
-    message: str
-    result: Optional[List[StoryPointEstimation]] = None
-    error: Optional[str] = None
-
-
-class StoryPointGenerationState(TypedDict):
-    """LangGraph State"""
-    user_input: str
-    epic_info: str
-    story_info: str
-    reference_stories: str
-    raw_response: str
-    parsed_estimations: List[Dict[str, Any]]
-    validated_estimations: List[StoryPointEstimation]
-    errors: List[str]
-    current_step: str

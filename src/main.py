@@ -27,10 +27,6 @@ async def health_check():
     """
     return {"status": "healthy"}
 
-@app.get("/")
-async def root():
-    return {"message": "Project Management Agent API"}
-
 
 if __name__ == "__main__":
     import uvicorn

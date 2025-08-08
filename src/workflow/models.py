@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List, Optional, Dict, Any, TypedDict
+from typing import List, Optional, Dict, TypedDict
 from datetime import datetime
 
 from epic.models import Epic, EpicRequest
@@ -30,17 +30,6 @@ class WorkflowResponse(BaseModel):
     total_estimations: int
     execution_time: float
     workflow_status: str
-
-
-class WorkflowProcessingStatus(BaseModel):
-    """워크플로우 처리 상태 모델"""
-    task_id: str
-    status: str  # "pending", "processing", "completed", "failed"
-    current_step: str
-    message: str
-    progress: int  # 0-100
-    result: Optional[WorkflowResponse] = None
-    error: Optional[str] = None
 
 
 class ProjectManagementState(TypedDict):

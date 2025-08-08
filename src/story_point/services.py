@@ -3,12 +3,12 @@ import logging
 import pandas as pd
 import os
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import List, Optional, Dict
 from langchain_community.chat_models import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
 
 from story_point.prompts import STORY_POINT_ESTIMATION_PROMPT
-from story_point.models import StoryPointEstimation, StoryPointRequest, StoryPointProcessingStatus
+from story_point.models import StoryPointEstimation, StoryPointRequest
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -23,7 +23,6 @@ class StoryPointEstimationAgent:
             temperature=temperature,
             api_key=openai_api_key
         )
-        self.processing_tasks: Dict[str, StoryPointProcessingStatus] = {}
         self.csv_file_path = csv_file_path
         self.reference_data: Optional[pd.DataFrame] = None
         
@@ -270,7 +269,7 @@ class StoryPointEstimationAgent:
         )
         return [fallback_estimation]
         
-    async def estimate_story_points(self, request: StoryPointRequest) -> List[StoryPointEstimation]:
+    def estimate_story_points(self, request: StoryPointRequest) -> List[StoryPointEstimation]:
         """스토리 포인트 추정 (동기)"""
         try:
             # 1. 참고 스토리 데이터 가져오기
@@ -325,35 +324,3 @@ class StoryPointEstimationAgent:
             # 오류 발생 시 기본 추정 반환
             return self._create_fallback_estimation(request.story_info.title if request.story_info else "기본 스토리")
         
-    async def estimate_story_points_async(self, request: StoryPointRequest, task_id: str):
-        """스토리 포인트 추정 (비동기)"""
-        try:
-            # 상태 업데이트
-            self.processing_tasks[task_id] = StoryPointProcessingStatus(
-                task_id=task_id,
-                status="processing",
-                message="스토리 포인트 추정 중..."
-            )
-            
-            estimations = await self.estimate_story_points(request)
-            
-            # 완료 상태 업데이트
-            self.processing_tasks[task_id] = StoryPointProcessingStatus(
-                task_id=task_id,
-                status="completed",
-                message="스토리 포인트 추정 완료",
-                result=estimations
-            )
-            
-        except Exception as e:
-            logger.error(f"비동기 스토리 포인트 추정 오류: {str(e)}")
-            self.processing_tasks[task_id] = StoryPointProcessingStatus(
-                task_id=task_id,
-                status="failed",
-                message="스토리 포인트 추정 실패",
-                error=str(e)
-            )
-    
-    def get_task_status(self, task_id: str) -> StoryPointProcessingStatus:
-        """작업 상태 조회"""
-        return self.processing_tasks.get(task_id)
