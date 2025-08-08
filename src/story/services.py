@@ -3,6 +3,7 @@ import logging
 from typing import Dict, List
 
 from langchain_community.chat_models import ChatOpenAI
+from langchain.agents import create_react_agent
 from langchain.prompts import ChatPromptTemplate
 
 from story.prompts import STORY_GENERATOR_PROMPT
@@ -22,6 +23,10 @@ class StoryGeneratorAgent:
             api_key=openai_api_key
         )
         self.processing_tasks: Dict[str, StoryProcessingStatus] = {}
+    
+    def _create_agent(self, prompt: ChatPromptTemplate):
+        self.agent = create_react_agent(llm=self.llm,tools=[],prompt=prompt)
+        
 
     def _generate_storys_with_llm(self, prompt: ChatPromptTemplate, user_input: str, epic_info: str, max_storys: int) -> str:
         """LLM을 사용하여 스토리 생성"""

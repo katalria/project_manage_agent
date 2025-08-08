@@ -2,15 +2,17 @@ version: '3.8'
 
 services:
   fastapi:
-    build: .
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
     ports:
       - "8000:8000"
     volumes:
-      - ./src:/app/src
-      - ./data:/app/data
-      - ./logs:/app/logs
+      - ../src:/app/src
+      - ../data:/app/data
+      - ../logs:/app/logs
     env_file:
-      - .env
+      - ../.env
     environment:
       - PYTHONPATH=/app
     restart: unless-stopped
