@@ -81,7 +81,7 @@ class StoryPointEstimationAgent:
             ]
             
             # 최신순으로 정렬하고 제한
-            domain_stories = domain_stories.sort_values('created_at', ascending=False).head(limit)
+            # domain_stories = domain_stories.sort_values('created_at', ascending=False).head(limit)
             
             reference_stories = []
             for _, row in domain_stories.iterrows():
