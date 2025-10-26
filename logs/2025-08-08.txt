@@ -1,0 +1,9 @@
+2025-08-08T16:05:09.330352+09:00 - orchestrator.routes - INFO - 오케스트레이터 실행 시작: 스토리를 수정해줘 
+2025-08-08T16:05:24.782944+09:00 - orchestrator.routes - INFO - 오케스트레이터 실행 완료 - API 시간: 15.45초
+2025-08-08T16:05:24.784099+09:00 - orchestrator.routes - INFO - 결과: 상태=completed_with_errors, 에픽=1521, 스토리=0, 포인트=0
+2025-08-08T16:20:32.538261+09:00 - orchestrator.routes - INFO - 오케스트레이터 실행 시작: 간단한 할일 관리 앱을 만들어주세요
+2025-08-08T16:20:48.995502+09:00 - orchestrator.routes - INFO - 오케스트레이터 실행 완료 - API 시간: 16.46초
+2025-08-08T16:20:48.995614+09:00 - orchestrator.routes - INFO - 결과: 상태=completed_with_errors, 에픽=1651, 스토리=0, 포인트=0
+2025-08-08T17:04:57.471959+09:00 - orchestrator.routes - INFO - 오케스트레이터 실행 시작: 간단한 할일 관리 앱을 만들어주세요
+2025-08-08T17:07:04.778848+09:00 - orchestrator.routes - INFO - 오케스트레이터 실행 완료 - API 시간: 127.31초
+2025-08-08T17:07:04.780859+09:00 - orchestrator.routes - INFO - 결과: 상태=completed, 에픽=5, 스토리=12, 포인트=12

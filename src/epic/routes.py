@@ -1,6 +1,5 @@
-from fastapi import APIRouter, HTTPException, BackgroundTasks
+from fastapi import APIRouter, HTTPException
 from datetime import datetime
-from uuid import uuid4
 import os
 
 from utils.logger import get_logger
