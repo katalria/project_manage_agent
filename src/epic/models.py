@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List, Dict, Any, Optional, TypedDict
+from typing import List, Optional
 from datetime import datetime
 import uuid
 
@@ -31,22 +31,3 @@ class EpicResponse(BaseModel):
     generation_time: float
 
 
-class EpicProcessingStatus(BaseModel):
-    """처리 상태 모델"""
-    task_id: str
-    status: str  # "pending", "processing", "completed", "failed"
-    message: str
-    result: Optional[List[Epic]] = None
-    error: Optional[str] = None
-
-
-class EpicGenerationState(TypedDict):
-    """LangGraph State"""
-    user_input: str
-    project_info: str
-    max_epics: int
-    raw_response: str
-    parsed_epics: List[Dict[str, Any]]
-    validated_epics: List[Epic]
-    errors: List[str]
-    current_step: str

@@ -63,19 +63,19 @@ dev-debug:
 	poetry run uvicorn src.main:app --reload --host 0.0.0.0 --port 8000 --log-level debug
 
 docker-up:
-	docker compose up -d
+	docker compose -f docker/docker-compose.yaml up
 
 docker-build:
-	docker compose up -d --build
+	docker compose -f docker/docker-compose.yaml up -d --build
 
 docker-down:
-	docker compose down
+	docker compose -f docker/docker-compose.yaml down
 
 docker-in:
 	docker exec -it project_manage_agent-fastapi-1 bash
 
 docker-logs:
-	docker compose logs -f fastapi
+	docker compose logs -f project_manage_agent-fastapi-1
 
 run-exp:
 	poetry run python src/train.py $(foreach v,$(filter-out $@,$(MAKECMDGOALS)), $(v)=$($(v)))

@@ -1,12 +1,13 @@
 import json
 import logging
-from typing import Dict, List
+from typing import List, Dict
 
 from langchain_community.chat_models import ChatOpenAI
+from langchain.agents import create_react_agent
 from langchain.prompts import ChatPromptTemplate
 
 from story.prompts import STORY_GENERATOR_PROMPT
-from story.models import Story, StoryRequest, StoryProcessingStatus
+from story.models import Story, StoryRequest
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -21,7 +22,10 @@ class StoryGeneratorAgent:
             temperature=temperature,
             api_key=openai_api_key
         )
-        self.processing_tasks: Dict[str, StoryProcessingStatus] = {}
+    
+    def _create_agent(self, prompt: ChatPromptTemplate):
+        self.agent = create_react_agent(llm=self.llm,tools=[],prompt=prompt)
+        
 
     def _generate_storys_with_llm(self, prompt: ChatPromptTemplate, user_input: str, epic_info: str, max_storys: int) -> str:
         """LLM을 사용하여 스토리 생성"""
@@ -139,7 +143,7 @@ class StoryGeneratorAgent:
     #     )
     #     return [fallback_epic]
         
-    async def generate_storys(self, request: StoryRequest) -> List[Story]:
+    def generate_storys(self, request: StoryRequest) -> List[Story]:
         """에픽 생성 (동기)"""
         try:
             # 1. LLM으로 에픽 생성
@@ -168,35 +172,3 @@ class StoryGeneratorAgent:
             # 오류 발생 시 기본 스토리 반환
             return self._create_fallback_story(request.user_input)
         
-    async def generate_storys_async(self, request: StoryRequest, task_id: str):
-        """스토리 생성 (비동기)"""
-        try:
-            # 상태 업데이트
-            self.processing_tasks[task_id] = StoryProcessingStatus(
-                task_id=task_id,
-                status="processing",
-                message="스토리 생성 중..."
-            )
-            
-            storys = await self.generate_storys(request)
-            
-            # 완료 상태 업데이트
-            self.processing_tasks[task_id] = StoryProcessingStatus(
-                task_id=task_id,
-                status="completed",
-                message="스토리 생성 완료",
-                result=storys
-            )
-            
-        except Exception as e:
-            logger.error(f"비동기 스토리 생성 오류: {str(e)}")
-            self.processing_tasks[task_id] = StoryProcessingStatus(
-                task_id=task_id,
-                status="failed",
-                message="스토리 생성 실패",
-                error=str(e)
-            )
-    
-    def get_task_status(self, task_id: str) -> StoryProcessingStatus:
-        """작업 상태 조회"""
-        return self.processing_tasks.get(task_id)
