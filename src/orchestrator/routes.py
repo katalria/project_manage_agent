@@ -142,13 +142,117 @@ def test_orchestrator():
         }
 
 
+@router.post("/execute-from-step", response_model=OrchestratorResponse)
+def execute_from_step(request: dict):
+    """특정 단계부터 워크플로우 실행"""
+    try:
+        start_step = request.get("start_step")
+        state_data = request.get("state_data", {})
+
+        if not start_step:
+            raise HTTPException(status_code=400, detail="start_step is required")
+
+        if start_step not in ["epic", "story", "point"]:
+            raise HTTPException(status_code=400, detail="Invalid start_step. Must be one of: epic, story, point")
+
+        logger.info(f"특정 단계부터 실행 시작: {start_step}")
+
+        orchestrator = get_orchestrator()
+        result = orchestrator.execute_from_step(start_step, state_data)
+
+        logger.info(f"특정 단계부터 실행 완료: {start_step}")
+        return OrchestratorResponse(**result)
+
+    except Exception as e:
+        logger.error(f"특정 단계 실행 오류: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/execute-next-step", response_model=OrchestratorResponse)
+def execute_next_step(request: dict):
+    """현재 상태에서 다음 단계만 실행"""
+    try:
+        state_data = request.get("state_data", {})
+
+        if not state_data:
+            raise HTTPException(status_code=400, detail="state_data is required")
+
+        logger.info("다음 단계 실행 시작")
+
+        orchestrator = get_orchestrator()
+        result = orchestrator.execute_next_step(state_data)
+
+        logger.info("다음 단계 실행 완료")
+        return OrchestratorResponse(**result)
+
+    except Exception as e:
+        logger.error(f"다음 단계 실행 오류: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/workflow-status")
+def get_workflow_status(request: dict):
+    """워크플로우 현재 상태 조회"""
+    try:
+        state_data = request.get("state_data", {})
+
+        if not state_data:
+            raise HTTPException(status_code=400, detail="state_data is required")
+
+        logger.info("워크플로우 상태 조회")
+
+        orchestrator = get_orchestrator()
+        status = orchestrator.get_workflow_status(state_data)
+
+        return {
+            "status": "success",
+            "workflow_progress": status
+        }
+
+    except Exception as e:
+        logger.error(f"워크플로우 상태 조회 오류: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/available-steps")
+def get_available_steps():
+    """실행 가능한 워크플로우 단계 목록"""
+    return {
+        "available_steps": [
+            {
+                "step": "epic",
+                "description": "에픽 생성 단계",
+                "requirements": ["user_input", "project_info"],
+                "outputs": ["epics"]
+            },
+            {
+                "step": "story",
+                "description": "스토리 생성 단계",
+                "requirements": ["epics"],
+                "outputs": ["stories"]
+            },
+            {
+                "step": "point",
+                "description": "스토리 포인트 추정 단계",
+                "requirements": ["stories"],
+                "outputs": ["story_points"]
+            }
+        ],
+        "workflow_info": {
+            "full_pipeline": "epic -> story -> point",
+            "can_start_from": ["epic", "story", "point"],
+            "can_execute_next": True
+        }
+    }
+
+
 @router.get("/test-mock")
 def test_orchestrator_mock():
     """Mock 데이터로 오케스트레이터 테스트"""
     from epic.models import Epic
     from story.models import Story
     from story_point.models import StoryPointEstimation
-    
+
     # Mock 데이터 생성
     mock_epic = Epic(
         title="사용자 인증 시스템",
@@ -157,12 +261,12 @@ def test_orchestrator_mock():
         priority="High",
         acceptance_criteria=[
             "사용자가 이메일로 회원가입할 수 있다",
-            "사용자가 로그인/로그아웃할 수 있다", 
+            "사용자가 로그인/로그아웃할 수 있다",
             "관리자는 사용자 권한을 관리할 수 있다"
         ],
         included_tasks=["회원가입", "로그인", "권한관리"]
     )
-    
+
     mock_story = Story(
         title="이메일 회원가입 기능",
         description="사용자가 이메일과 비밀번호로 회원가입할 수 있는 기능",
@@ -176,11 +280,11 @@ def test_orchestrator_mock():
         tags=["authentication", "signup"]
     )
     mock_story.epic_id = mock_epic.id
-    
+
     mock_estimation = StoryPointEstimation(
         story_title="이메일 회원가입 기능",
         estimated_point=5,
-        domain="fullstack", 
+        domain="fullstack",
         estimation_method="cross_area",
         reasoning="프론트엔드 폼 구현, 백엔드 API, 데이터베이스 스키마 설계가 필요",
         complexity_factors=["UI 구현", "API 개발", "유효성 검증", "데이터베이스"],
@@ -189,7 +293,7 @@ def test_orchestrator_mock():
         assumptions=["기본적인 React/Node.js 스택 사용"],
         risks=["이메일 서비스 연동 복잡도"]
     )
-    
+
     # Mock 결과 구성
     mock_result = {
         "status": "completed",
@@ -214,7 +318,7 @@ def test_orchestrator_mock():
         "completed_steps": ["analyze", "epic", "story", "point"],
         "errors": []
     }
-    
+
     return {
         "test_status": "success",
         "data_type": "mock",

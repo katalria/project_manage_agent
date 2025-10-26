@@ -1,0 +1,116 @@
+2025-09-09T15:42:41.179275+09:00 - slack_bot.bot - INFO - Initializing Slack bot...
+2025-09-09T15:42:41.179587+09:00 - slack_bot.bot - INFO - Bot token configured: Yes
+2025-09-09T15:42:41.179834+09:00 - slack_bot.bot - INFO - Signing secret configured: Yes
+2025-09-09T15:42:49.812788+09:00 - slack_bot.bot - INFO - Initializing Slack bot...
+2025-09-09T15:42:49.813032+09:00 - slack_bot.bot - INFO - Bot token configured: Yes
+2025-09-09T15:42:49.813266+09:00 - slack_bot.bot - INFO - Signing secret configured: Yes
+2025-09-09T15:42:56.160878+09:00 - slack_bot.bot - INFO - Initializing Slack bot...
+2025-09-09T15:42:56.161153+09:00 - slack_bot.bot - INFO - Bot token configured: Yes
+2025-09-09T15:42:56.161402+09:00 - slack_bot.bot - INFO - Signing secret configured: Yes
+2025-09-09T15:43:03.552829+09:00 - slack_bot.bot - INFO - Initializing Slack bot...
+2025-09-09T15:43:03.553192+09:00 - slack_bot.bot - INFO - Bot token configured: Yes
+2025-09-09T15:43:03.553437+09:00 - slack_bot.bot - INFO - Signing secret configured: Yes
+2025-09-09T15:45:18.686101+09:00 - slack_bot.bot - INFO - Initializing Slack bot...
+2025-09-09T15:45:18.686662+09:00 - slack_bot.bot - INFO - Bot token configured: Yes
+2025-09-09T15:45:18.686860+09:00 - slack_bot.bot - INFO - Signing secret configured: Yes
+2025-09-09T15:45:20.233670+09:00 - slack_bot.bot - INFO - Initializing Slack bot...
+2025-09-09T15:45:20.233949+09:00 - slack_bot.bot - INFO - Bot token configured: Yes
+2025-09-09T15:45:20.234146+09:00 - slack_bot.bot - INFO - Signing secret configured: Yes
+2025-09-09T15:46:47.880754+09:00 - slack_bot.routes - INFO - Slack event received
+2025-09-09T15:49:17.576260+09:00 - slack_bot.routes - INFO - Slack command received
+2025-09-09T15:49:17.586397+09:00 - slack_bot.bot - INFO - Project command received - User: U05R4MNHT0W, Channel: D05R8DDPC93
+2025-09-09T15:52:40.562026+09:00 - slack_bot.routes - INFO - Slack command received
+2025-09-09T15:52:40.573938+09:00 - slack_bot.bot - INFO - Project command received - User: U05R4MNHT0W, Channel: C09E4C1FSTD
+2025-09-09T15:54:05.843246+09:00 - slack_bot.routes - INFO - Slack command received
+2025-09-09T15:54:05.849466+09:00 - slack_bot.bot - INFO - Project command received - User: U05R4MNHT0W, Channel: C09E4C1FSTD
+2025-09-09T15:54:37.340703+09:00 - slack_bot.routes - INFO - Slack command received
+2025-09-09T15:54:37.345099+09:00 - slack_bot.bot - INFO - Project command received - User: U05R4MNHT0W, Channel: C09E4C1FSTD
+2025-09-09T15:54:39.568705+09:00 - slack_bot.routes - INFO - Slack interactive request received
+2025-09-09T15:54:42.004675+09:00 - slack_bot.routes - INFO - Slack interactive request received
+2025-09-09T15:54:42.006082+09:00 - slack_bot.bot - INFO - Create epic/story button clicked - User: U05R4MNHT0W, Channel: C09E4C1FSTD
+2025-09-09T15:55:11.775886+09:00 - slack_bot.routes - INFO - Slack interactive request received
+2025-09-09T15:55:11.780995+09:00 - slack_bot.bot - INFO - Project analysis request from U05R4MNHT0W: 사내 데이터 웨어하우스 구축
+2025-09-09T15:55:12.298930+09:00 - slack_bot.bot - INFO - Starting orchestrator execution for user U05R4MNHT0W
+2025-09-09T15:55:13.922013+09:00 - slack_bot.routes - INFO - Slack event received
+2025-09-09T15:57:59.563931+09:00 - slack_bot.bot - INFO - Orchestrator execution completed - Status: completed, Epics: 5, Stories: 18
+2025-09-09T15:58:01.325985+09:00 - slack_bot.routes - INFO - Slack event received
+2025-09-09T16:08:35.435906+09:00 - slack_bot.routes - INFO - Slack interactive request received
+2025-09-09T16:08:37.032312+09:00 - slack_bot.routes - INFO - Slack event received
+2025-09-09T16:08:44.469226+09:00 - slack_bot.routes - INFO - Slack interactive request received
+2025-09-09T16:08:44.906400+09:00 - slack_bot.bot - ERROR - Failed to create Notion page: cannot import name 'get_notion_service' from 'notion_client.client' (/usr/local/lib/python3.11/site-packages/notion_client/client.py)
+2025-09-09T16:08:46.499863+09:00 - slack_bot.routes - INFO - Slack event received
+2025-09-09T16:08:46.556626+09:00 - slack_bot.routes - INFO - Slack event received
+2025-09-09T16:12:01.852682+09:00 - slack_bot.bot - INFO - Initializing Slack bot...
+2025-09-09T16:12:01.853098+09:00 - slack_bot.bot - INFO - Bot token configured: Yes
+2025-09-09T16:12:01.853367+09:00 - slack_bot.bot - INFO - Signing secret configured: Yes
+2025-09-09T16:12:03.341756+09:00 - slack_bot.bot - INFO - Initializing Slack bot...
+2025-09-09T16:12:03.342047+09:00 - slack_bot.bot - INFO - Bot token configured: Yes
+2025-09-09T16:12:03.342379+09:00 - slack_bot.bot - INFO - Signing secret configured: Yes
+2025-09-09T16:13:09.432402+09:00 - slack_bot.routes - INFO - Slack interactive request received
+2025-09-09T16:13:11.116676+09:00 - slack_bot.routes - INFO - Slack event received
+2025-09-09T16:13:12.655061+09:00 - slack_bot.routes - INFO - Slack interactive request received
+2025-09-09T16:13:13.999698+09:00 - slack_bot.routes - INFO - Slack event received
+2025-09-09T16:13:27.056188+09:00 - slack_bot.routes - INFO - Slack interactive request received
+2025-09-09T16:13:31.871927+09:00 - slack_bot.routes - INFO - Slack interactive request received
+2025-09-09T16:13:31.875531+09:00 - slack_bot.bot - INFO - Create epic/story button clicked - User: U05R4MNHT0W, Channel: C09E4C1FSTD
+2025-09-09T16:14:30.964421+09:00 - slack_bot.routes - INFO - Slack interactive request received
+2025-09-09T16:14:30.973459+09:00 - slack_bot.bot - INFO - Project analysis request from U05R4MNHT0W: 고려아이텍 프로젝트 2차 개발. 기존 개발 완료된 서비스에서 추가 화면 수정사항, 렌즈파워 계산기능 구현, 렌즈 사이즈 계산기능 구현 추가 완성
+2025-09-09T16:14:31.433429+09:00 - slack_bot.bot - INFO - Starting orchestrator execution for user U05R4MNHT0W
+2025-09-09T16:14:33.269437+09:00 - slack_bot.routes - INFO - Slack event received
+2025-09-09T16:16:06.942600+09:00 - slack_bot.bot - INFO - Orchestrator execution completed - Status: completed, Epics: 3, Stories: 9
+2025-09-09T16:16:08.956316+09:00 - slack_bot.routes - INFO - Slack event received
+2025-09-09T16:17:19.099435+09:00 - slack_bot.routes - INFO - Slack interactive request received
+2025-09-09T16:17:20.506280+09:00 - slack_bot.routes - INFO - Slack event received
+2025-09-09T16:17:24.521502+09:00 - slack_bot.routes - INFO - Slack interactive request received
+2025-09-09T16:17:24.963598+09:00 - slack_bot.bot - ERROR - Failed to create Notion page: cannot import name 'get_notion_service' from 'notion_client.client' (/usr/local/lib/python3.11/site-packages/notion_client/client.py)
+2025-09-09T16:17:25.943039+09:00 - slack_bot.routes - INFO - Slack event received
+2025-09-09T16:17:26.671055+09:00 - slack_bot.routes - INFO - Slack event received
+2025-09-09T16:26:55.642091+09:00 - slack_bot.bot - INFO - Initializing Slack bot...
+2025-09-09T16:26:55.642635+09:00 - slack_bot.bot - INFO - Bot token configured: Yes
+2025-09-09T16:26:55.643015+09:00 - slack_bot.bot - INFO - Signing secret configured: Yes
+2025-09-09T16:27:08.968587+09:00 - slack_bot.bot - INFO - Initializing Slack bot...
+2025-09-09T16:27:08.968875+09:00 - slack_bot.bot - INFO - Bot token configured: Yes
+2025-09-09T16:27:08.969064+09:00 - slack_bot.bot - INFO - Signing secret configured: Yes
+2025-09-09T16:27:34.206037+09:00 - slack_bot.bot - INFO - Initializing Slack bot...
+2025-09-09T16:27:34.206375+09:00 - slack_bot.bot - INFO - Bot token configured: Yes
+2025-09-09T16:27:34.206761+09:00 - slack_bot.bot - INFO - Signing secret configured: Yes
+2025-09-09T16:32:00.655152+09:00 - slack_bot.bot - INFO - Initializing Slack bot...
+2025-09-09T16:32:00.656273+09:00 - slack_bot.bot - INFO - Bot token configured: Yes
+2025-09-09T16:32:00.656552+09:00 - slack_bot.bot - INFO - Signing secret configured: Yes
+2025-09-09T16:32:02.156860+09:00 - slack_bot.bot - INFO - Initializing Slack bot...
+2025-09-09T16:32:02.157173+09:00 - slack_bot.bot - INFO - Bot token configured: Yes
+2025-09-09T16:32:02.157524+09:00 - slack_bot.bot - INFO - Signing secret configured: Yes
+2025-09-09T16:34:46.302177+09:00 - slack_bot.routes - INFO - Slack command received
+2025-09-09T16:34:46.328040+09:00 - slack_bot.bot - INFO - Project command received - User: U05RFQ2FE8J, Channel: C09E4C1FSTD
+2025-09-09T16:34:50.132059+09:00 - slack_bot.routes - INFO - Slack interactive request received
+2025-09-09T16:34:50.133962+09:00 - slack_bot.bot - INFO - Create epic/story button clicked - User: U05RFQ2FE8J, Channel: C09E4C1FSTD
+2025-09-09T16:36:01.508908+09:00 - slack_bot.routes - INFO - Slack interactive request received
+2025-09-09T16:36:01.517198+09:00 - slack_bot.bot - INFO - Project analysis request from U05RFQ2FE8J: 고려아이텍 2차 개발. 추가화면 수정사항 반영, 렌즈 파워 계산기능 구현, 렌즈 사이즈 계산 기능 구현
+2025-09-09T16:36:02.502938+09:00 - slack_bot.bot - INFO - Starting orchestrator execution for user U05RFQ2FE8J
+2025-09-09T16:36:03.656836+09:00 - slack_bot.routes - INFO - Slack event received
+2025-09-09T16:37:34.804124+09:00 - slack_bot.bot - INFO - Orchestrator execution completed - Status: completed, Epics: 3, Stories: 9
+2025-09-09T16:37:36.628167+09:00 - slack_bot.routes - INFO - Slack event received
+2025-09-09T16:37:39.917868+09:00 - slack_bot.routes - INFO - Slack interactive request received
+2025-09-09T16:37:41.080487+09:00 - slack_bot.routes - INFO - Slack event received
+2025-09-09T16:37:51.304006+09:00 - slack_bot.routes - INFO - Slack interactive request received
+2025-09-09T16:37:53.012416+09:00 - slack_bot.routes - INFO - Slack event received
+2025-09-09T16:37:59.931522+09:00 - slack_bot.routes - INFO - Slack interactive request received
+2025-09-09T16:38:02.076290+09:00 - slack_bot.routes - INFO - Slack event received
+2025-09-09T16:38:29.274846+09:00 - slack_bot.routes - INFO - Slack interactive request received
+2025-09-09T16:38:30.392648+09:00 - slack_bot.routes - INFO - Slack event received
+2025-09-09T16:38:31.407227+09:00 - notion_service.client - INFO - Created project page: 26918888-122e-81ed-b2fb-ec8d6089cd59
+2025-09-09T16:38:34.550856+09:00 - slack_bot.bot - INFO - Successfully created Notion page 26918888-122e-81ed-b2fb-ec8d6089cd59 for user U05RFQ2FE8J
+2025-09-09T16:38:36.072325+09:00 - slack_bot.routes - INFO - Slack event received
+2025-09-09T16:38:38.612525+09:00 - slack_bot.routes - INFO - Slack interactive request received
+2025-09-09T17:08:37.033102+09:00 - slack_bot.bot - INFO - Initializing Slack bot...
+2025-09-09T17:08:37.033630+09:00 - slack_bot.bot - INFO - Bot token configured: Yes
+2025-09-09T17:08:37.033946+09:00 - slack_bot.bot - INFO - Signing secret configured: Yes
+2025-09-09T17:08:48.423682+09:00 - slack_bot.bot - INFO - Initializing Slack bot...
+2025-09-09T17:08:48.424123+09:00 - slack_bot.bot - INFO - Bot token configured: Yes
+2025-09-09T17:08:48.424475+09:00 - slack_bot.bot - INFO - Signing secret configured: Yes
+2025-09-09T17:09:05.155105+09:00 - slack_bot.bot - INFO - Initializing Slack bot...
+2025-09-09T17:09:05.155357+09:00 - slack_bot.bot - INFO - Bot token configured: Yes
+2025-09-09T17:09:05.155629+09:00 - slack_bot.bot - INFO - Signing secret configured: Yes
+2025-09-09T17:09:12.873899+09:00 - slack_bot.bot - INFO - Initializing Slack bot...
+2025-09-09T17:09:12.874315+09:00 - slack_bot.bot - INFO - Bot token configured: Yes
+2025-09-09T17:09:12.874567+09:00 - slack_bot.bot - INFO - Signing secret configured: Yes

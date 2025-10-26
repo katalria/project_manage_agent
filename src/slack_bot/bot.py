@@ -9,6 +9,16 @@ load_dotenv()
 
 logger = get_logger(__name__)
 
+# 슬랙 봇 토큰 검증
+if not os.environ.get("SLACK_BOT_TOKEN"):
+    logger.error("SLACK_BOT_TOKEN environment variable is not set!")
+if not os.environ.get("SLACK_SIGNING_SECRET"):
+    logger.error("SLACK_SIGNING_SECRET environment variable is not set!")
+
+logger.info("Initializing Slack bot...")
+logger.info(f"Bot token configured: {'Yes' if os.environ.get('SLACK_BOT_TOKEN') else 'No'}")
+logger.info(f"Signing secret configured: {'Yes' if os.environ.get('SLACK_SIGNING_SECRET') else 'No'}")
+
 # Slack 앱 초기화
 app = App(
     token=os.environ.get("SLACK_BOT_TOKEN"),
@@ -19,16 +29,20 @@ app = App(
 @app.message("hello")
 def message_hello(message, say):
     """Hello 메시지 응답"""
-    say(f"Hi <@{message['user']}>! 프로젝트 관리 봇입니다. `/project` 명령어로 시작해보세요!")
+    user_id = message['user']
+    logger.info(f"Hello message received from user: {user_id}")
+    say(f"Hi <@{user_id}>! 프로젝트 관리 봇입니다. `/project` 명령어로 시작해보세요!")
 
 # 슬래시 커맨드 핸들러
 @app.command("/project")
-def handle_project_command(ack, body, client):
+def handle_project_command(ack, respond, body, client):
     """프로젝트 관리 슬래시 커맨드"""
     ack()
     
     user_id = body["user_id"]
     channel_id = body["channel_id"]
+    
+    logger.info(f"Project command received - User: {user_id}, Channel: {channel_id}")
     
     # 초기 메뉴 블록
     blocks = [
@@ -63,11 +77,24 @@ def handle_project_command(ack, body, client):
         }
     ]
     
-    client.chat_postMessage(
-        channel=channel_id,
-        blocks=blocks,
-        text="프로젝트 관리 메뉴"
-    )
+    # respond() 사용으로 권한 문제 해결
+    try:
+        respond(
+            blocks=blocks,
+            text="프로젝트 관리 메뉴"
+        )
+    except Exception as e:
+        logger.error(f"Failed to respond to slash command: {str(e)}")
+        # 대안: DM으로 전송 시도
+        try:
+            client.chat_postMessage(
+                channel=f"@{body['user_name']}",  # 사용자명으로 DM 시도
+                blocks=blocks,
+                text="프로젝트 관리 메뉴"
+            )
+        except Exception as dm_error:
+            logger.error(f"Failed to send DM: {str(dm_error)}")
+            respond("❌ 메시지 전송에 실패했습니다. 봇에게 DM 권한을 부여해주세요.")
 
 # 버튼 클릭 핸들러
 @app.action("create_epic_story")
@@ -77,6 +104,8 @@ def handle_create_epic_story(ack, body, client):
     
     user_id = body["user"]["id"]
     channel_id = body["channel"]["id"]
+    
+    logger.info(f"Create epic/story button clicked - User: {user_id}, Channel: {channel_id}")
     
     # 모달 열기
     client.views_open(
@@ -128,23 +157,31 @@ def handle_project_submission(ack, body, client, view):
     
     logger.info(f"Project analysis request from {user_id}: {description}")
     
-    # 채널에 분석 시작 메시지 전송
-    client.chat_postMessage(
-        channel=user_id,  # DM으로 전송
-        text="🔄 프로젝트 분석을 시작합니다...",
-        blocks=[
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": f"🔄 *프로젝트 분석 시작*\n\n**요구사항:**\n{description}\n\n**프로젝트 유형:** {project_info or '미지정'}\n\n분석 중입니다. 잠시만 기다려주세요..."
-                }
-            }
-        ]
-    )
-    
-    # 오케스트레이터 호출
+    # DM 채널 열기 및 분석 실행
     try:
+        # DM 채널 열기 시도
+        dm_response = client.conversations_open(users=[user_id])
+        dm_channel = dm_response["channel"]["id"]
+        
+        # 분석 시작 메시지 전송
+        client.chat_postMessage(
+            channel=dm_channel,
+            text="🔄 프로젝트 분석을 시작합니다...",
+            blocks=[
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": f"🔄 *프로젝트 분석 시작*\n\n**요구사항:**\n{description}\n\n**프로젝트 유형:** {project_info or '미지정'}\n\n분석 중입니다. 잠시만 기다려주세요..."
+                    }
+                }
+            ]
+        )
+        
+        # 오케스트레이터 호출
+        logger.info(f"Starting orchestrator execution for user {user_id}")
+        logger.debug(f"User input: {description[:100]}...")
+        
         from orchestrator.orchestrator import get_orchestrator
         
         orchestrator = get_orchestrator()
@@ -153,15 +190,16 @@ def handle_project_submission(ack, body, client, view):
             project_info=project_info
         )
         
+        logger.info(f"Orchestrator execution completed - Status: {result['status']}, Epics: {result.get('total_epics', 0)}, Stories: {result.get('total_stories', 0)}")
+        
         if result["status"] == "completed":
-            # 분석 결과를 사용자 세션에 저장 (실제로는 Redis나 DB를 사용해야 함)
-            # 지금은 간단히 메모리에 저장
+            # 분석 결과를 사용자 세션에 저장
             if not hasattr(app, "user_sessions"):
                 app.user_sessions = {}
             app.user_sessions[user_id] = result
             
             client.chat_postMessage(
-                channel=user_id,
+                channel=dm_channel,
                 text="✅ 분석이 완료되었습니다!",
                 blocks=[
                     {
@@ -205,7 +243,7 @@ def handle_project_submission(ack, body, client, view):
             )
         else:
             client.chat_postMessage(
-                channel=user_id,
+                channel=dm_channel,
                 text="❌ 분석 중 오류가 발생했습니다.",
                 blocks=[
                     {
@@ -217,12 +255,24 @@ def handle_project_submission(ack, body, client, view):
                     }
                 ]
             )
+            
     except Exception as e:
-        logger.error(f"Orchestrator execution error: {str(e)}")
-        client.chat_postMessage(
-            channel=user_id,
-            text=f"❌ 시스템 오류가 발생했습니다: {str(e)}"
-        )
+        logger.error(f"Error in analysis workflow: {str(e)}")
+        # DM 채널이 있으면 DM으로, 없으면 원래 채널로 오류 메시지 전송
+        try:
+            if 'dm_channel' in locals():
+                client.chat_postMessage(
+                    channel=dm_channel,
+                    text=f"❌ 시스템 오류가 발생했습니다: {str(e)}"
+                )
+            else:
+                # DM 채널 열기에 실패한 경우
+                client.chat_postMessage(
+                    channel=body["channel"]["id"], 
+                    text="❌ DM을 열 수 없습니다. 봇에게 DM 권한을 부여하거나 봇과의 대화를 먼저 시작해주세요."
+                )
+        except Exception as fallback_error:
+            logger.error(f"Failed to send error message: {str(fallback_error)}")
 
 # 에픽 결과 보기
 @app.action("show_epics")
@@ -436,37 +486,47 @@ def handle_show_points(ack, body, client):
         }
     ]
     
+    displayed_stories = set()  # 중복 표시 방지
+    
     for epic_result in epic_results:
         epic = epic_result["epic"]
         story_points = epic_result["story_points"]
         
         if story_points:
-            epic_points = sum(sp.estimated_point for sp in story_points)
-            total_points += epic_points
-            
-            blocks.append({
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": f"*📋 {epic.title}* - 총 {epic_points} 포인트"
-                }
-            })
-            
+            # 중복 제거된 스토리 포인트만 계산
+            unique_story_points = []
             for sp in story_points:
-                point_text = f"• *{sp.story_title}*: {sp.estimated_point} 포인트\n"
-                point_text += f"  📊 복잡도: {sp.complexity_factors}\n"
-                point_text += f"  🎯 신뢰도: {sp.confidence_level}\n"
-                point_text += f"  💭 추정 근거: {sp.reasoning[:100]}..."
+                if sp.story_title not in displayed_stories:
+                    unique_story_points.append(sp)
+                    displayed_stories.add(sp.story_title)
+            
+            if unique_story_points:  # 유니크한 스토리 포인트가 있을 때만 표시
+                epic_points = sum(sp.estimated_point for sp in unique_story_points)
+                total_points += epic_points
                 
                 blocks.append({
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": point_text
+                        "text": f"*📋 {epic.title}* - 총 {epic_points} 포인트"
                     }
                 })
-            
-            blocks.append({"type": "divider"})
+                
+                for sp in unique_story_points:
+                    point_text = f"• *{sp.story_title}*: {sp.estimated_point} 포인트\n"
+                    point_text += f"  📊 복잡도: {sp.complexity_factors}\n"
+                    point_text += f"  🎯 신뢰도: {sp.confidence_level}\n"
+                    point_text += f"  💭 추정 근거: {sp.reasoning[:100]}..."
+                    
+                    blocks.append({
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": point_text
+                        }
+                    })
+                
+                blocks.append({"type": "divider"})
     
     # 총 포인트 요약
     blocks.insert(1, {
@@ -540,7 +600,7 @@ def handle_approve_and_save(ack, body, client):
     )
     
     try:
-        from notion_client.client import get_notion_service
+        from notion_service import get_notion_service
         
         notion_service = get_notion_service()
         
